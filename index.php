@@ -37,9 +37,13 @@
 				echo $section;
 				echo "<br>";
 				$result = str_repeat($section, (int)$multiplier) . $result;
-				$compressed_string = substr_replace($compressed_string, "", ($start - 2), strlen($section) + 3);
+				$compressed_string = str_replace($multiplier . "[" . $section . "]", "", $compressed_string);
 				echo $compressed_string;
 				echo "<br>";
+				if (strpos($compressed_string, "[") === false)
+				{
+					$result = $result . $compressed_string;
+				}
 			}
 			
 			return $result;
