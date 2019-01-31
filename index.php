@@ -30,35 +30,49 @@
 			$result = "";
 			while (strpos($compressed_string, "[") !== false)
 			{
+				// Last '[' occurrence
 				$start = strrpos($compressed_string, '[');
+				// First ']' occurrence after last '[' occurrence
 				$end = strpos($compressed_string, ']', $start);
-				$multiplier = substr($compressed_string, ($start - 1), 1);
+				// find multiplier
+				// Negative start position for last '[' occurrence
+				$negative_start = ($start - strlen($compressed_string)) + 1;
+				$preceding_bracket = "";
+				if (strrpos($compressed_string, "]", $negative_start) !== false)
+				{
+					$preceding_bracket = strrpos($compressed_string, "]", $negative_start);
+				} else
+				{
+					$preceding_bracket = 0;
+				}
+				// multiplier for last [] group
+				$multiplier = substr($compressed_string, $preceding_bracket + 1, ($start - $preceding_bracket) - 1);
+				echo $preceding_bracket;
+				echo "<br>";
+				echo $multiplier;
+				echo "<br>";
+				// String section to be multiplied
 				$section = substr($compressed_string, ($start + 1), ($end - $start) - 1);
 				echo $section;
 				echo "<br>";
-				$result = str_repeat($section, (int)$multiplier) . $result;
-				$compressed_string = str_replace($multiplier . "[" . $section . "]", "", $compressed_string);
-				echo $compressed_string;
+				$result = str_repeat($section, (int)$multiplier);
+				$compressed_string = str_replace($multiplier . "[" . $section . "]", $result, $compressed_string);
 				echo "<br>";
-				if (strpos($compressed_string, "[") === false)
-				{
-					$result = $result . $compressed_string;
-				}
 			}
 			
-			return $result;
+			return $compressed_string;
 		}
 		echo decompress($compressed_1);
 	?>
-	<p>Input: 10[a]</p>
+	<p>Input: 19[a]</p>
 	<?php
-		$compressed_2 = "9[a]";
+		$compressed_2 = "19[a]";
 		echo decompress($compressed_2);
 	?>
 	<p>Input: 2[3[a]b]</p>
 	<?php
 		$compressed_3 = "2[3[a]b]";
-		echo decompress($compressed_2);
+		echo decompress($compressed_3);
 	?>
   <script src="js/vendor/modernizr-3.6.0.min.js"></script>
   <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
