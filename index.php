@@ -22,7 +22,7 @@
   <![endif]-->
 
   <!-- Add your site or application content here -->
-	<p>Input: 3[abc]4[ab]c</p>
+	<p><strong>Input: 3[abc]4[ab]c</strong></p>
 	<?php
 		$compressed_1 = "3[abc]4[ab]c";
 		function decompress($compressed_string)
@@ -32,44 +32,63 @@
 			{
 				// Last '[' occurrence
 				$start = strrpos($compressed_string, '[');
+				echo 'start: ' . $start;
+				echo "<br>";
 				// First ']' occurrence after last '[' occurrence
 				$end = strpos($compressed_string, ']', $start);
+				echo 'end: ' . $end;
+				echo "<br>";
 				// find multiplier
 				// Negative start position for last '[' occurrence
-				$negative_start = ($start - strlen($compressed_string)) + 1;
+				$negative_start = ($start - strlen($compressed_string));
+				echo 'negative_start: ' . $negative_start;
+				echo "<br>";
 				$preceding_bracket = "";
 				if (strrpos($compressed_string, "]", $negative_start) !== false)
 				{
-					$preceding_bracket = strrpos($compressed_string, "]", $negative_start);
+					$preceding_bracket = strrpos($compressed_string, "]", $negative_start - 1);
+					echo 'if-a';
+					echo "<br>";
+				} elseif (strrpos($compressed_string, "[", $negative_start - 1) !== false)
+				{
+					$preceding_bracket = strrpos($compressed_string, "[", $negative_start - 1);
+					echo 'if-b';
+					echo "<br>";
 				} else
 				{
 					$preceding_bracket = 0;
+					echo 'if-c';
+					echo "<br>";
 				}
 				// multiplier for last [] group
 				$multiplier = substr($compressed_string, $preceding_bracket + 1, ($start - $preceding_bracket) - 1);
-				echo $preceding_bracket;
+				echo 'preceding_bracket: ' . $preceding_bracket;
 				echo "<br>";
-				echo $multiplier;
+				echo 'multiplier: ' . $multiplier;
 				echo "<br>";
 				// String section to be multiplied
 				$section = substr($compressed_string, ($start + 1), ($end - $start) - 1);
-				echo $section;
+				echo 'section: ' . $section;
 				echo "<br>";
 				$result = str_repeat($section, (int)$multiplier);
-				$compressed_string = str_replace($multiplier . "[" . $section . "]", $result, $compressed_string);
+				$compressed_string = substr_replace($compressed_string, $result, $preceding_bracket + 1, strlen($multiplier . "[" . $section . "]"));
+				echo 'result: ' . $result;
 				echo "<br>";
+				echo 'compressed_string: ' . $compressed_string;
+				echo "<br>";
+				echo "<hr>";
 			}
 			
 			return $compressed_string;
 		}
 		echo decompress($compressed_1);
 	?>
-	<p>Input: 19[a]</p>
+	<p><strong>Input: 19[a]</strong></p>
 	<?php
 		$compressed_2 = "19[a]";
 		echo decompress($compressed_2);
 	?>
-	<p>Input: 2[3[a]b]</p>
+	<p><strong>Input: 2[3[a]b]</strong></p>
 	<?php
 		$compressed_3 = "2[3[a]b]";
 		echo decompress($compressed_3);
