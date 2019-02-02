@@ -27,7 +27,6 @@
 		$compressed_1 = "3[abc]4[ab]c";
 		function decompress($compressed_string)
 		{
-			$result = "";
 			while (strpos($compressed_string, "[") !== false)
 			{
 				// Last '[' occurrence
