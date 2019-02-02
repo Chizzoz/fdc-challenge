@@ -34,7 +34,6 @@ Other rules:
 <?php
 	function decompress($compressed_string)
 	{
-		$result = "";
 		while (strpos($compressed_string, "[") !== false)
 		{
 			// Last '[' occurrence
