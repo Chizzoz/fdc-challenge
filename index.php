@@ -32,51 +32,43 @@
 			{
 				// Last '[' occurrence
 				$start = strrpos($compressed_string, '[');
-				echo 'start: ' . $start;
-				echo "<br>";
 				// First ']' occurrence after last '[' occurrence
 				$end = strpos($compressed_string, ']', $start);
-				echo 'end: ' . $end;
-				echo "<br>";
 				// find multiplier
 				// Negative start position for last '[' occurrence
-				$negative_start = ($start - strlen($compressed_string));
-				echo 'negative_start: ' . $negative_start;
-				echo "<br>";
-				$preceding_bracket = "";
-				if (strrpos($compressed_string, "]", $negative_start) !== false)
+				$negative_start = ($start - strlen($compressed_string)) - 1;
+				$preceding_open_bracket = strrpos($compressed_string, "[", $negative_start);
+				$preceding_close_bracket = strrpos($compressed_string, "]", $negative_start);
+				if ($preceding_close_bracket > $preceding_open_bracket)
 				{
-					$preceding_bracket = strrpos($compressed_string, "]", $negative_start - 1);
-					echo 'if-a';
-					echo "<br>";
-				} elseif (strrpos($compressed_string, "[", $negative_start - 1) !== false)
+					$preceding_bracket = $preceding_close_bracket;
+				} elseif ($preceding_open_bracket > $preceding_close_bracket)
 				{
-					$preceding_bracket = strrpos($compressed_string, "[", $negative_start - 1);
-					echo 'if-b';
-					echo "<br>";
+					$preceding_bracket = $preceding_open_bracket;
 				} else
 				{
 					$preceding_bracket = 0;
-					echo 'if-c';
-					echo "<br>";
 				}
 				// multiplier for last [] group
-				$multiplier = substr($compressed_string, $preceding_bracket + 1, ($start - $preceding_bracket) - 1);
-				echo 'preceding_bracket: ' . $preceding_bracket;
-				echo "<br>";
-				echo 'multiplier: ' . $multiplier;
-				echo "<br>";
+				if ($preceding_bracket == 0)
+				{
+					$multiplier = substr($compressed_string, $preceding_bracket, ($start - $preceding_bracket));
+				} else
+				{
+					$multiplier = substr($compressed_string, $preceding_bracket + 1, ($start - $preceding_bracket) - 1);
+				}
 				// String section to be multiplied
 				$section = substr($compressed_string, ($start + 1), ($end - $start) - 1);
-				echo 'section: ' . $section;
-				echo "<br>";
+				// expand compressed string section
 				$result = str_repeat($section, (int)$multiplier);
-				$compressed_string = substr_replace($compressed_string, $result, $preceding_bracket + 1, strlen($multiplier . "[" . $section . "]"));
-				echo 'result: ' . $result;
-				echo "<br>";
-				echo 'compressed_string: ' . $compressed_string;
-				echo "<br>";
-				echo "<hr>";
+				// replace compressed string section with expanded string section
+				if ($preceding_bracket == 0)
+				{
+					$compressed_string = substr_replace($compressed_string, $result, $preceding_bracket, strlen($multiplier . "[" . $section . "]"));
+				} else
+				{
+					$compressed_string = substr_replace($compressed_string, $result, $preceding_bracket + 1, strlen($multiplier . "[" . $section . "]"));
+				}
 			}
 			
 			return $compressed_string;
